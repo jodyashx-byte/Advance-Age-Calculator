@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Age Calculator</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f172a">
+
+<style>
+/* SAME UI (shortened a bit) */
+:root {
+  --bg: #0f172a;
+  --card: rgba(255,255,255,0.1);
+  --text: #ffffff;
+  --accent: #38bdf8;
+}
+
+body.light {
+  --bg: #f1f5f9;
+  --card: rgba(255,255,255,0.8);
+  --text: #0f172a;
+}
+
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  backdrop-filter: blur(15px);
+  background: var(--card);
+  padding: 25px;
+  border-radius: 20px;
+  text-align: center;
+  width: 320px;
+}
+
+button {
+  padding: 10px 15px;
+  border-radius: 10px;
+  border: none;
+  background: var(--accent);
+  color: white;
+}
+
+.result {
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>🎂 Age Calculator</h2>
+  <input type="date" id="dob"><br><br>
+  <button onclick="calculateAge()">Calculate</button>
+
+  <div class="result" id="result"></div>
+  <div class="result" id="nextBirthday"></div>
+
+  <br>
+  <button onclick="toggleMode()">🌙 Toggle Mode</button>
+</div>
+
+<script>
+function calculateAge() {
+  let dob = document.getElementById("dob").value;
+  if (!dob) return alert("Select DOB!");
+
+  let birthDate = new Date(dob);
+  let today = new Date();
+
+  let years = today.getFullYear() - birthDate.getFullYear();
+  let months = today.getMonth() - birthDate.getMonth();
+  let days = today.getDate() - birthDate.getDate();
+
+  if (days < 0) {
+    months--;
+    days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+  }
+
+  if (months < 0) {
+    years--;
+    months += 12;
+  }
+
+  document.getElementById("result").innerText =
+    `${years} Years, ${months} Months, ${days} Days`;
+
+  let nextBday = new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+  if (nextBday < today) nextBday.setFullYear(today.getFullYear() + 1);
+
+  let daysLeft = Math.ceil((nextBday - today) / (1000*60*60*24));
+  document.getElementById("nextBirthday").innerText =
+    `🎂 Next Birthday in ${daysLeft} days`;
+}
+
+function toggleMode() {
+  document.body.classList.toggle("light");
+}
+
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+</script>
+
+</body>
+</html>
